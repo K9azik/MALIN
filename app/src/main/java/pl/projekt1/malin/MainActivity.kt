@@ -1,4 +1,4 @@
-package pl.projekt1.malin.ui
+package pl.projekt1.malin
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -24,7 +24,7 @@ import pl.projekt1.malin.ui.theme.MainViewModel
 class MainActivity : ComponentActivity() {
     companion object{
         private const val BEACONS_FILE_NAME =
-            "beacons_json"
+            "beacons.json"
     }
 
     private val dataSource = BeaconDataSource(
