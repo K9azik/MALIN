@@ -21,7 +21,7 @@ class MainViewModel(
     }
 
     private val _beacons = MutableStateFlow<List<Beacon>>(emptyList())
-    val beacons: StateFlow<List<Beacon>> = _beacons
+    val uiState: StateFlow<List<Beacon>> = _beacons
 
     fun loadBeacons(){
         viewModelScope.launch{
