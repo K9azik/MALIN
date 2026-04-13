@@ -20,75 +20,66 @@ import androidx.compose.ui.platform.LocalContext
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanIntentResult
 import com.journeyapps.barcodescanner.ScanOptions
-import pl.projekt1.malin.data.dataSources.BeaconDataSource
 import pl.projekt1.malin.ui.theme.MALINTheme
 import pl.projekt1.malin.ui.theme.MainViewModel
 
 
 class MainActivity : ComponentActivity() {
-    companion object{
-        private const val BEACONS_FILE_NAME =
-            "beacons.json"
-    }
 
-    private val dataSource = BeaconDataSource(
-        inputStreamProvider = {
-            assets.open(BEACONS_FILE_NAME)
-        } )
-    private val viewModel = MainViewModel(dataSource)
+    private val viewModel = MainViewModel()
 
-    override fun onCreate(
-        savedInstanceState: Bundle?
-    ){
+    override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             MALINTheme {
-                Scaffold(modifier =
-                            Modifier.fillMaxSize()) {innerPadding ->
-                    BeaconList(
+                Scaffold(
+                    modifier = Modifier.fillMaxSize()
+                ) { innerPadding ->
+                    QrScannerScreen(
                         viewModel = viewModel,
-                        modifier =
-                            Modifier.padding(innerPadding)
-                    ) }
+                        modifier = Modifier.padding(innerPadding)
+                    )
+                }
             }
         }
-        viewModel.loadBeacons()
     }
 }
 
 @Composable
-fun BeaconList(
+fun QrScannerScreen(
     viewModel: MainViewModel,
     modifier: Modifier
 ){
     val context = LocalContext.current
     val activity = context as Activity
-    val state by viewModel.uiState.collectAsState()
+
+    val qr by viewModel.qrContent.collectAsState()
+
     val launcher = rememberLauncherForActivityResult(
         contract = ScanContract()
     ) { result: ScanIntentResult ->
         val qrContent = result.contents
         if (qrContent.isNullOrBlank()) {
-            //viewModel.cancelQrScanning()
-            Toast.makeText(activity, "Cancelled", Toast.LENGTH_LONG).show();
+            Toast.makeText(activity, "Cancelled", Toast.LENGTH_LONG).show()
         } else {
-            //viewModel.handleQrContent(qrContent)
-            Toast.makeText(activity, "Scanned: $qrContent", Toast.LENGTH_LONG).show();
+            viewModel.handleQrContent(qrContent)
         }
     }
+
     Button(
         onClick = {
             launcher.launch(ScanOptions())
         },
-        modifier = Modifier,
+        modifier = modifier,
     ) {
         Text("Scan QR Code")
     }
 
-
+    qr?.let {
+        Text("Scanned: $it")
+    }
 }
-
 
 
 

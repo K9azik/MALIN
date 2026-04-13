@@ -1,36 +1,25 @@
 package pl.projekt1.malin.ui.theme
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
 import android.util.Log
 
-import pl.projekt1.malin.data.dataSources.BeaconDataSource
-import pl.projekt1.malin.data.mappers.toDomain
-import pl.projekt1.malin.domain.model.Beacon
+class MainViewModel : ViewModel() {
 
-
-class MainViewModel(
-    private val beaconDataSource: BeaconDataSource
-) : ViewModel() {
-
-    companion object{
+    companion object {
         private const val TAG = "pw.MainViewModel"
     }
 
-    private val _beacons = MutableStateFlow<List<Beacon>>(emptyList())
-    val uiState: StateFlow<List<Beacon>> = _beacons
+    private val _qrContent = MutableStateFlow<String?>(null)
+    val qrContent: StateFlow<String?> = _qrContent
 
-    fun loadBeacons(){
-        viewModelScope.launch{
-            val result = beaconDataSource.loadBeacons()
-            result.onSuccess { beaconDto ->
-                _beacons.value = beaconDto.map { it.toDomain() }
-            }.onFailure { error ->
-                Log.e(TAG, "Błąd wczytywania beaconów", error)
-            }
-        }
+    fun handleQrContent(content: String) {
+        Log.d(TAG, "\nQR zeskanowany: $content")
+        _qrContent.value = content
+    }
+
+    fun clearQrContent() {
+        _qrContent.value = null
     }
 }
